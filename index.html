@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <title>Document</title>
+    <style>
+        body {
+            height: 100vh;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .center {
+            /* top: 40%;
+            width: 100%;
+            text-align: center;
+            position: absolute;
+            font-size: 10em;
+            font-weight: 500;
+            color: white;
+            letter-spacing: -5px; */
+            display: block;
+            top: 40%;
+            width: 100%;
+            text-align: center;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <div class="center">
+        <h1 id="time"></h1>
+        <h2 id="date"></h2>
+        <h2 id="quote"></h2>
+    </div>
+    <div class="search">
+        <input type="text">
+        <button>Search</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+
+        //Event Listener
+        $("button").on("click", function() {
+            var searchTerm = $("input").val();
+            console.log(searchTerm);
+            window.open(`https://www.google.com/search?q=${searchTerm}`)
+        })
+
+        //AJAX GET request from API to get wallpaper image
+        function getWallpaper() {
+            $.ajax({
+                url: "https://api.unsplash.com/photos/random?query=desktopwallpaper&client_id=d57cfaed3ab5f9cf3787433988c3ecabfc4dcf398c1cd043209a2bc843bca911",
+                method: "GET"
+            }).then(function(response) {
+                //console.log(response.urls.full);
+                $("body").css(`background-image`, `url(${response.urls.full})`)
+            });            
+        };
+
+        //AJAX GET request from API to get quote
+        function getQuote() {
+            $.ajax({
+                url: "https://quotes.rest/qod?category=inspire",
+                method: "GET"
+            }).then(function(response) {
+                //console.log(response)
+                var quote = response.contents.quotes[0];
+                $("#quote").text(`${quote.quote} - ${quote.author}`);
+            })
+        }
+
+        // Current Time function
+        function startTime() {
+
+            var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday", "Friday","Saturday"]
+            var today = new Date();
+            var h = today.getHours();
+            var m = today.getMinutes();
+            var day = today.getDay();
+            var month = today.getMonth();
+            var date = today.getDate();
+            var year = today.getFullYear();
+            m = checkTime(m);
+            $("#time").text(h + ":" + m);
+            $("#date").text(`${days[day]}, ${months[month]} ${date}, ${year}`)
+            var t = setTimeout(startTime, 59000);
+        }
+
+        function checkTime(i) {
+            if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
+            return i;
+        }
+
+        //Page load initialization
+        getWallpaper();
+        //setInterval(getWallpaper, 10000) //Invokes getWallpaper function to get new wallpaper
+        getQuote();
+        startTime();
+        
+        
+    </script>
+</body>
+</html>
