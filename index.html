@@ -14,6 +14,7 @@
             background-position: center;
             margin: 0;
             font-family: 'Roboto', sans-serif;
+            color: white;
         }
 
         .center {
@@ -56,8 +57,10 @@
 
         //AJAX GET request from API to get wallpaper image
         function getWallpaper() {
+
+            var key = "d57cfaed3ab5f9cf3787433988c3ecabfc4dcf398c1cd043209a2bc843bca911";
             $.ajax({
-                url: "https://api.unsplash.com/photos/random?query=desktopwallpaper&client_id=d57cfaed3ab5f9cf3787433988c3ecabfc4dcf398c1cd043209a2bc843bca911",
+                url: "https://api.unsplash.com/photos/random?query=desktopwallpaper&client_id=" + key,
                 method: "GET"
             }).then(function(response) {
                 //console.log(response.urls.full);
@@ -99,12 +102,34 @@
             if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
             return i;
         }
+        
+        // Get current location 
+
+
+        // Get Weather
+        function getWeather() {
+            navigator.geolocation.getCurrentPosition(function(location) {
+                var lat = location.coords.latitude;
+                var lon = location.coords.longitude;
+                //console.log(location.coords.accuracy);
+                var key = "a3aab2839ff54737c5d2cdcc443fe979"
+
+                $.ajax({
+                    url: `https://api.openweathermap.org/data/2.5/weather?units=imperial&lat=${lat}&lon=${lon}&appid=${key}`,
+                    method: "GET"
+                }).then(function(response) {
+                    console.log(response);
+                })
+
+            });
+        }
 
         //Page load initialization
         getWallpaper();
         //setInterval(getWallpaper, 10000) //Invokes getWallpaper function to get new wallpaper
         getQuote();
         startTime();
+        getWeather();
         
         
     </script>
