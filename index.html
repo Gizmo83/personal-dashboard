@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Gothic+A1" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
     <title>My Dashboard</title>
     <style>
         body {
@@ -41,6 +42,18 @@
             margin: auto;
             top: 25%;
         }
+        #pause {
+            bottom: 0;
+            right: 0;
+            position: absolute;
+            background: none;
+            border: none;
+            color: rgba(108,117,125,0.5);
+        }
+        #pause:focus {
+            outline: none;
+        }
+    
     </style>
 </head>
 <body>
@@ -55,6 +68,9 @@
         <h2 id="date"><!--date here--></h2>
         <h2 id="weather"><!--weather here--></h2>
         <h6 id="quote"><!--quote here--></h6>
+    </div>
+    <div>
+        <button id="pause"><i class="fas fa-pause"></i></button>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -133,15 +149,20 @@
                     method: "GET"
                 }).then(function(response) {
                     console.log(response);
-                    $("#date").append(` | ${response.weather[0].main} ${response.main.temp} &deg;F`)
+                    $("#weather").append(` | ${response.weather[0].main} ${response.main.temp} &deg;F`)
                 })
 
             });
         };
 
+        function pauseWallpaper() {
+            clearInterval(timer)
+        }
+        
+
         //Page load initialization
         getWallpaper();
-        setInterval(getWallpaper, 30000) //Invokes getWallpaper function to get new wallpaper
+        var timer = setInterval(getWallpaper, 30000); //Invokes getWallpaper function to get new wallpaper
         getQuote();
         startTime();
         getWeather();
