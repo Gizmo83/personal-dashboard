@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Gothic+A1" rel="stylesheet">
+    <title>My Dashboard</title>
     <style>
         body {
             height: 100vh;
@@ -13,36 +14,40 @@
             background-repeat: no-repeat;
             background-position: center;
             margin: 0;
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Gothic A1', sans-serif;
             color: white;
         }
-
         .center {
-            /* top: 40%;
-            width: 100%;
-            text-align: center;
             position: absolute;
-            font-size: 10em;
-            font-weight: 500;
-            color: white;
-            letter-spacing: -5px; */
-            display: block;
             top: 40%;
             width: 100%;
             text-align: center;
-            position: absolute;
+            background-color: rgba(108,117,125,0.3);
+            padding: 15px;
+        }
+        .center h1 {
+            font-size: 8em;
+            font-weight: 600;
+            margin-bottom: -10px;
+        }
+        .input-group {
+            width: 750px;
+            margin: auto;
+            top: 25%;
         }
     </style>
 </head>
 <body>
-    <div class="center">
-        <h1 id="time"></h1>
-        <h2 id="date"></h2>
-        <h2 id="quote"></h2>
+    <div class="input-group">
+        <input type="text" class="form-control" placeholder="Google" aria-label="Google" aria-describedby="search-btn">
+        <div class="input-group-append">
+            <button class="btn btn-secondary" type="button" id="search-btn">Search</button>
+        </div>
     </div>
-    <div class="search">
-        <input type="text">
-        <button>Search</button>
+    <div class="center">
+        <h1 id="time"><!--time here--></h1>
+        <h2 id="date"><!--date here--></h2>
+        <h6 id="quote"><!--quote here--></h6>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -51,11 +56,12 @@
         //Event Listener
         $("button").on("click", function() {
             var searchTerm = $("input").val();
-            console.log(searchTerm);
+            //console.log(searchTerm);
             window.open(`https://www.google.com/search?q=${searchTerm}`)
-        })
+        });
 
-        //AJAX GET request from API to get wallpaper image
+        //AJAX GET request from API to get wallpaper image 
+        //https://unsplash.com/developers
         function getWallpaper() {
 
             var key = "d57cfaed3ab5f9cf3787433988c3ecabfc4dcf398c1cd043209a2bc843bca911";
@@ -63,12 +69,13 @@
                 url: "https://api.unsplash.com/photos/random?query=desktopwallpaper&client_id=" + key,
                 method: "GET"
             }).then(function(response) {
-                //console.log(response.urls.full);
+                //console.log(response);
                 $("body").css(`background-image`, `url(${response.urls.full})`)
             });            
         };
 
         //AJAX GET request from API to get quote
+        //https://quotes.rest/
         function getQuote() {
             $.ajax({
                 url: "https://quotes.rest/qod?category=inspire",
@@ -78,55 +85,55 @@
                 var quote = response.contents.quotes[0];
                 $("#quote").text(`${quote.quote} - ${quote.author}`);
             })
-        }
+        };
 
         // Current Time function
+        // Get date/time from built-in Date object
         function startTime() {
 
-            var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday", "Friday","Saturday"]
             var today = new Date();
             var h = today.getHours();
             var m = today.getMinutes();
-            var day = today.getDay();
-            var month = today.getMonth();
-            var date = today.getDate();
-            var year = today.getFullYear();
+
             m = checkTime(m);
-            $("#time").text(h + ":" + m);
-            $("#date").text(`${days[day]}, ${months[month]} ${date}, ${year}`)
-            var t = setTimeout(startTime, 59000);
-        }
+            $("#time").text(`${h}:${m}`);
+            var t = setTimeout(startTime, 55000);
+
+            var dateStr = today.toDateString();
+
+            $("#date").text(dateStr)
+
+        };
 
         function checkTime(i) {
             if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
             return i;
-        }
+        };
         
-        // Get current location 
-
-
-        // Get Weather
+        //Get user location from built-in Navigator object
+        //Send location to API to get weather
+        //https://openweathermap.org/api
         function getWeather() {
             navigator.geolocation.getCurrentPosition(function(location) {
+                //console.log(location);
                 var lat = location.coords.latitude;
                 var lon = location.coords.longitude;
-                //console.log(location.coords.accuracy);
                 var key = "a3aab2839ff54737c5d2cdcc443fe979"
 
                 $.ajax({
                     url: `https://api.openweathermap.org/data/2.5/weather?units=imperial&lat=${lat}&lon=${lon}&appid=${key}`,
                     method: "GET"
                 }).then(function(response) {
-                    console.log(response);
+                    //console.log(response);
+                    $("#date").append(` | ${response.main.temp} &deg;F`)
                 })
 
             });
-        }
+        };
 
         //Page load initialization
         getWallpaper();
-        //setInterval(getWallpaper, 10000) //Invokes getWallpaper function to get new wallpaper
+        setInterval(getWallpaper, 30000) //Invokes getWallpaper function to get new wallpaper
         getQuote();
         startTime();
         getWeather();
