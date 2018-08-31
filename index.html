@@ -124,8 +124,8 @@
                     url: `https://api.openweathermap.org/data/2.5/weather?units=imperial&lat=${lat}&lon=${lon}&appid=${key}`,
                     method: "GET"
                 }).then(function(response) {
-                    //console.log(response);
-                    $("#date").append(` | ${response.main.temp} &deg;F`)
+                    console.log(response);
+                    $("#date").append(` | ${response.weather[0].main} ${response.main.temp} &deg;F`)
                 })
 
             });
