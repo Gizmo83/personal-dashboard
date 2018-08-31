@@ -39,12 +39,12 @@
     </style>
 </head>
 <body>
-    <div class="input-group">
-        <input type="text" class="form-control" placeholder="Google" aria-label="Google" aria-describedby="search-btn">
+    <form class="input-group">
+        <input type="text" class="form-control" placeholder="Google">
         <div class="input-group-append">
-            <button class="btn btn-secondary" type="button" id="search-btn">Search</button>
+            <button class="btn btn-secondary" type="submit" id="search-btn">Search</button>
         </div>
-    </div>
+    </form>
     <div class="center">
         <h1 id="time"><!--time here--></h1>
         <h2 id="date"><!--date here--></h2>
@@ -55,7 +55,8 @@
     <script type="text/javascript">
 
         //Event Listener
-        $("button").on("click", function() {
+        $(".input-group").submit(function(event) {
+            event.preventDefault();
             var searchTerm = $("input").val();
             //console.log(searchTerm);
             window.open(`https://www.google.com/search?q=${searchTerm}`)
