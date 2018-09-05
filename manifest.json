@@ -1,0 +1,19 @@
+{
+    "manifest_version": 2,
+    "name": "Minimal Start",
+    "version": "1.0",
+    "chrome_url_overrides": {
+        "newtab": "index.html"
+    },
+    "permissions": [
+        "geolocation",
+        "storage",
+        "https://fonts.googleapis.com/css?family=Gothic+A1",
+        "https://use.fontawesome.com/releases/v5.3.1/css/all.css",
+        "https://www.google.com/*",
+        "https://api.unsplash.com/*",
+        "https://images.unsplash.com/*",
+        "https://quotes.rest/*",
+        "https://api.openweathermap.org/*"
+    ]
+}

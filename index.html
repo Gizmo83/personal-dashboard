@@ -4,170 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css?family=Gothic+A1" rel="stylesheet">
+    <link rel="stylesheet" href="bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
-    <title>My Dashboard</title>
-    <style>
-        body {
-            height: 100vh;
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center;
-            margin: 0;
-            font-family: 'Gothic A1', sans-serif;
-            color: white;
-            transition: background-image 3s;
-            transition-delay: 3s;
-        }
-        .center {
-            position: absolute;
-            top: 40%;
-            width: 100%;
-            text-align: center;
-            background-color: rgba(108,117,125,0.3);
-            padding: 15px;
-        }
-        .center h1 {
-            font-size: 8em;
-            font-weight: 600;
-            margin-bottom: -10px;
-        }
-        .center h2 {
-            display: inline-block;
-        }
-        .input-group {
-            width: 90%;
-            max-width: 750px;
-            margin: auto;
-            top: 25%;
-        }
-        #pause {
-            bottom: 0;
-            right: 0;
-            position: absolute;
-            background: none;
-            border: none;
-            color: rgba(108,117,125,0.5);
-        }
-        #pause:focus {
-            outline: none;
-        }
-    
-    </style>
+    <link href="https://fonts.googleapis.com/css?family=Gothic+A1" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="jquery-3.3.1.min.js"></script>
+    <script src="popper.min.js" ></script>
+    <script src="bootstrap.min.js" ></script>
+    <script src="index.js"></script>
+    <title>Minimal Start</title>
 </head>
 <body>
-    <form class="input-group">
-        <input type="text" class="form-control" placeholder="Google">
+    <button id="menu-btn" class="btn" type="button" data-toggle="modal" data-target="#menu-modal">
+            <i class="fas fa-bars"></i>
+    </button>
+    <form id="input-search-form" class="input-group trans">
+        <input type="text" id="search-input" class="form-control" placeholder="Google">
         <div class="input-group-append">
-            <button class="btn btn-secondary" type="submit" id="search-btn">Search</button>
+            <button class="btn btn-secondary" type="submit" id="search-btn"><i class="fas fa-search"></i></button>
         </div>
     </form>
-    <div class="center">
-        <h1 id="time"><!--time here--></h1>
-        <h2 id="date"><!--date here--></h2>
-        <h2 id="weather"><!--weather here--></h2>
-        <h6 id="quote"><!--quote here--></h6>
+    <div class="wrapper">
+        <div class="center">
+            <h1 id="time" class="trans"><!--time here--></h1>
+            <h2 id="date"><!--date here--></h2>
+            <h2 id="weather" data-container="body" data-toggle="popover" data-placement="right" data-content=""><!--weather here--></h2>
+            <h6 id="quote" class="trans"><!--quote here--></h6>
+        </div>
+        <div class="below-center trans"><!-- focus here --></div>
     </div>
-    <div>
-        <button id="pause"><i class="fas fa-pause"></i></button>
+    <div class="footer">
+        <p>Photo by <a id="wallpaper-artist" href=""></a> on <a href="https://unsplash.com/?utm_source=personaldashboard&utm_medium=referral">Unsplash</a></p>
+        <button id="pause-btn" class="btn" data-container="body" data-toggle="popover" data-placement="left" data-content="Like this image? Click and we'll keep it here.">
+            <i id="pause-icon" class="fas fa-pause"></i>
+        </button>
+        <button id="next-btn" class="btn" data-container="body" data-toggle="popover" data-placement="left" data-content="Next Image">
+            <i id="next-icon" class="fas fa-play"></i>
+        </button>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-
-        //Event Listener
-        $(".input-group").submit(function(event) {
-            event.preventDefault();
-            var searchTerm = $("input").val();
-            //console.log(searchTerm);
-            window.open(`https://www.google.com/search?q=${searchTerm}`)
-        });
-
-        //AJAX GET request from API to get wallpaper image 
-        //https://unsplash.com/developers
-        function getWallpaper() {
-
-            var key = "d57cfaed3ab5f9cf3787433988c3ecabfc4dcf398c1cd043209a2bc843bca911";
-            $.ajax({
-                url: "https://api.unsplash.com/photos/random?query=desktopwallpaper&client_id=" + key,
-                method: "GET"
-            }).then(function(response) {
-                //console.log(response);
-                $("body").css(`background-image`, `url(${response.urls.full})`)
-            });            
-        };
-
-        //AJAX GET request from API to get quote
-        //https://quotes.rest/
-        function getQuote() {
-            $.ajax({
-                url: "https://quotes.rest/qod?category=inspire",
-                method: "GET"
-            }).then(function(response) {
-                //console.log(response)
-                var quote = response.contents.quotes[0];
-                $("#quote").text(`${quote.quote} - ${quote.author}`);
-            })
-        };
-
-        // Current Time function
-        // Get date/time from built-in Date object
-        function startTime() {
-
-            var today = new Date();
-            var h = today.getHours();
-            var m = today.getMinutes();
-
-            m = checkTime(m);
-            $("#time").text(`${h}:${m}`);
-            var t = setTimeout(startTime, 55000);
-
-            var dateStr = today.toDateString();
-
-            $("#date").text(dateStr)
-
-        };
-
-        function checkTime(i) {
-            if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
-            return i;
-        };
-        
-        //Get user location from built-in Navigator object
-        //Send location to API to get weather
-        //https://openweathermap.org/api
-        function getWeather() {
-            navigator.geolocation.getCurrentPosition(function(location) {
-                //console.log(location);
-                var lat = location.coords.latitude;
-                var lon = location.coords.longitude;
-                var key = "a3aab2839ff54737c5d2cdcc443fe979"
-
-                $.ajax({
-                    url: `https://api.openweathermap.org/data/2.5/weather?units=imperial&lat=${lat}&lon=${lon}&appid=${key}`,
-                    method: "GET"
-                }).then(function(response) {
-                    console.log(response);
-                    $("#weather").append(` | ${response.weather[0].main} ${response.main.temp} &deg;F`)
-                })
-
-            });
-        };
-
-        function pauseWallpaper() {
-            clearInterval(timer)
-        }
-        
-
-        //Page load initialization
-        getWallpaper();
-        var timer = setInterval(getWallpaper, 30000); //Invokes getWallpaper function to get new wallpaper
-        getQuote();
-        startTime();
-        getWeather();
-        
-        
-    </script>
+    <!-- Slide Out Modal -->
+    <div class="modal fade" id="menu-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-slideout" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Dashboard Widgets</h5>
+                    <button type="button" id="close-btn" class="close" data-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav flex-column">
+                        <li id="name" class="nav-item">                        
+                            <form id="input-name-form" class="input-group">
+                                <input id="name-input" type="text" class="form-control" placeholder="Enter Name">
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary" type="submit" id="search-btn">Save</button>
+                                </div>
+                            </form>
+                        </li>
+                        <li class="nav-item">
+                            <label class="switch">
+                                <input type="checkbox" value="search" checked>
+                                <span class="slider round"></span>
+                            </label>
+                            Search Bar
+                        </li>
+                        <li class="nav-item">
+                            <label class="switch">
+                                <input type="checkbox" value="clock" checked>
+                                <span class="slider round"></span>
+                            </label>
+                            Clock
+                        </li>
+                        <li class="nav-item">
+                            <label class="switch">
+                                <input type="checkbox" value="date" checked>
+                                <span class="slider round"></span>
+                            </label>
+                            Date
+                        </li>
+                        <li id="toggle-weather" class="nav-item">
+                            <label class="switch">
+                                <input type="checkbox" value="weather" checked>
+                                <span class="slider round"></span>
+                            </label>
+                            Weather<br>
+                        </li>
+                        <li class="nav-item">
+                            <label class="switch">
+                                <input type="checkbox" value="quote" checked>
+                                <span class="slider round"></span>
+                            </label>
+                            Quote of the Day
+                        </li>
+                        <li class="nav-item">
+                            <label class="switch">
+                                <input type="checkbox" value="focus" checked>
+                                <span class="slider round"></span>
+                            </label>
+                            Focus
+                        </li>        
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <!-- <button type="button" class="btn btn-secondary">Save changes</button> -->
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
