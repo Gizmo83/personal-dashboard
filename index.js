@@ -26,6 +26,7 @@ $(function() {
 
     // Name click edit
     $(document).on("click", "#name-delete", function() {
+        localStorage.clear();
         chrome.storage.sync.clear(function() {
             location.reload();
         })
@@ -37,7 +38,7 @@ $(function() {
         var searchTerm = $("#search-input").val();
         //console.log(searchTerm);
         $("#search-input").val("");
-        window.open(`https://www.google.com/search?q=${searchTerm}`);
+        window.location.replace(`https://www.google.com/search?q=${searchTerm}`);
     });
 
     // Focus input box
@@ -57,7 +58,7 @@ $(function() {
         chrome.storage.sync.remove('focus', function() {
             checkFocus();
         })
-    })
+    });
 
     // Pause button
     $('#pause-btn').on('click', function() {
@@ -69,11 +70,34 @@ $(function() {
         getWallpaper();
     });
 
+    // Global variables
+    var focus;
+    //var timer;
+    var paused = false;
+    var locationReady;
+    var lat = "";
+    var lon = "";
+    var weatherText;
+    var weatherTextRemove;
+    var weatherAmPm = "-n"
+    var name = "";
+    var localTimestamp = localStorage.getItem("timestamp");
+    var localWallpaper = JSON.parse(localStorage.getItem("wallpaper_info"));
+
     // Checks for name from Chrome Storage
     function checkStorage() {
-        chrome.storage.sync.get('name', function(user) {
-            name = user.name;
-            //console.log(name)
+
+        chrome.storage.sync.get(function(data) {
+            //console.log(data);
+            if (data.search === false) {
+                $("#search-toggle").attr("checked", false);
+                menuToggle($("#search-toggle"));
+            } 
+            if (data.focus_toggle === false){
+                $("#focus-toggle").attr("checked", false);
+                menuToggle($("#focus-toggle"));
+            }
+            name = data.name;
             getTime();
             if (name) {
                 $('#name').empty().html(`<span id="name-delete"> Name: ${name} <i id="name-btn" class="fas fa-minus-circle"></i></span>`);
@@ -81,10 +105,8 @@ $(function() {
             } else {
                 return
             }
-        });
+        })
     };
-
-    var focus;
 
     // Checks for focus from Chrome Storage
     function checkFocus() {
@@ -113,7 +135,7 @@ $(function() {
     function getWallpaper() {
 
         if(paused) {
-            timer = setInterval(getWallpaper, 3.6e+6);
+            //timer = setInterval(getWallpaper, 3.6e+6);
             $("#pause-btn").css("display", "inline-block")
             paused = false;
         }
@@ -124,32 +146,32 @@ $(function() {
             method: "GET"
         }).then(function(response) {
             //console.log(response);
+            var date = new Date();
+            timestamp = date.getTime()
+            //console.log(timestamp)
+            var wallpaperInfo = {
+                wallpaper: response.urls.full,
+                link: response.user.links.html,
+                first_name: response.user.first_name,
+                last_name: response.user.last_name
+            }
+            // localStorage.setItem("wallpaper", response.urls.full);
+            localTimestamp = timestamp;
+            localStorage.setItem("timestamp", timestamp);
+            localStorage.setItem("wallpaper_info", JSON.stringify(wallpaperInfo));
             $("body").css(`background-image`, `url(${response.urls.full})`);
             $("#wallpaper-artist").attr("href", `${response.user.links.html}?utm_source=personaldashboard&utm_medium=referral`).text(`${response.user.first_name} ${response.user.last_name}`);
         });            
     };
 
-    var timer;
-    var paused = false;
-
     function pauseWallpaper() {
         
-        clearInterval(timer);
+        //clearInterval(timer);
+        localTimestamp = 9999999999999;
+        localStorage.setItem("timestamp", localTimestamp);
         $("#pause-btn").css("display", "none");
         paused = true;
-        // if (!paused) {
-        //     clearInterval(timer);
-        //     paused = true;
-        //     $("#pause-icon").removeClass("fa-pause").addClass("fa-play");
-        //     $("#pause-btn").attr("data-content", "Start Slideshow");
-        // }
-        // else {
-        //     timer = setInterval(getWallpaper, 3.6e+6);
-        //     paused = false;
-        //     $("#pause-icon").removeClass("fa-play").addClass("fa-pause");
-        //     //$("#pause-btn").attr("data-content", "Like this image? Click and we'll keep it here.");
-        // }
-        //console.log(paused)
+
     };
 
     //AJAX GET request from API to get quote
@@ -165,9 +187,7 @@ $(function() {
         })
     };
 
-    var ready;
-    var lat = "";
-    var lon = "";
+
 
     //Get user location from built-in Navigator object
     var getLocation = new Promise(function(resolve, reject) {
@@ -175,9 +195,9 @@ $(function() {
             //console.log(location);
             lat = location.coords.latitude;
             lon = location.coords.longitude;
-            ready = true;
+            locationReady = true;
 
-            if (ready) {
+            if (locationReady) {
                 resolve("done");
             } else {
                 reject("error")
@@ -185,8 +205,6 @@ $(function() {
         });
     });            
 
-    var weatherText;
-    var weatherTextRemove;
     //Send location to API to get weather
     //https://openweathermap.org/api
     function getWeather() {
@@ -196,35 +214,42 @@ $(function() {
             url: `https://api.openweathermap.org/data/2.5/weather?units=imperial&lat=${lat}&lon=${lon}&appid=${key}`,
             method: "GET"
         }).then(function(response) {
-            //console.log(response);
-            weatherText = ` | ${response.weather[0].main} ${response.main.temp} &deg;F`
+            console.log(response);
+            weatherText = ` | <i class="owf owf-${response.weather[0].id}${weatherAmPm}"> </i> ${response.main.temp} &deg;F`
+            //console.log(weatherText)
             weatherTextRemove = weatherText.replace(" | ", "");
             //console.log(weatherTextRemove)
             $("#weather").html(weatherText).attr("data-content", response.name);
-            $("#toggle-weather").append(`<span>Current Location: ${response.name}</span>`)
+            $("#weather-location").text(`Current Location: ${response.name}`)
         });
     };
 
     // Current Time function
     // Get date/time from built-in Date object
-
-    var name = "";
     function getTime() {
 
         var today = new Date();
         var h = today.getHours();
         var m = today.getMinutes();
         var amPm;
+        var time = today.getTime();
+
+        if (localTimestamp + 3.6e+6 <= time) {
+            getWallpaper();
+        }
 
         // condition to set greeting in placeholder
-        if (h < 12) {
+        if (h > 3 && h < 12) {
             $("#search-input").attr("placeholder", `Good morning${name ? `, ${name}.`: ""}`)
+            weatherAmPm = "-d";
         }
-        else if (h < 18) {
+        else if (h >= 12 && h < 18) {
             $("#search-input").attr("placeholder", `Good afternoon${name ? `, ${name}.`: ""}`)
+            weatherAmPm = "-d";
         }
         else {
             $("#search-input").attr("placeholder", `Good evening${name ? `, ${name}.`: ""}`)
+            weatherAmPm = "-n"
         }
 
         // condition to add zero to minutes that are less than 10
@@ -262,8 +287,14 @@ $(function() {
             case "search":
                 if (checked) {
                     $("#input-search-form").css({"visibility": "visible","opacity": "1" });
+                    chrome.storage.sync.set({
+                        'search': true
+                    });
                 } else {
                     $("#input-search-form").css({"visibility": "hidden","opacity": "0" });
+                    chrome.storage.sync.set({
+                        'search': false
+                    });
                 }
                 break;
             case "clock":
@@ -276,17 +307,35 @@ $(function() {
             case "date":
                 if (checked) {
                     $("#date").css("display", "inline-block");
+                    setTimeout(()=> {
+                        $("#date").css({"visibility": "visible","opacity": "1" })
+                    })
                     $("#weather").html(weatherText);
                 } else {
-                    $("#date").css("display", "none");
-                    $("#weather").html(weatherTextRemove)
+                    $("#date").css({"visibility": "hidden","opacity": "0" });
+                    $("#weather").css({"visibility": "hidden","opacity": "0" });
+                    setTimeout(()=> {
+                        $("#weather").html(weatherTextRemove)
+                        $("#weather").css({"visibility": "visible","opacity": "1" })
+                        $("#date").css("display", "none");
+                    },1000);
                 }
                 break;
             case "weather":
                 if (checked) {
                     $("#weather").css("display", "inline-block");
+                    setTimeout(()=> {
+                        $("#weather").css({"visibility": "visible","opacity": "1" })
+                        $("#date").css({"visibility": "visible","opacity": "1" })
+                    },1000);
                 } else {
-                    $("#weather").css("display", "none");
+                    $("#date").css({"visibility": "hidden","opacity": "0" });
+                    $("#weather").css({"visibility": "hidden","opacity": "0" });
+                    setTimeout(()=> {
+                        $("#date").css({"visibility": "visible","opacity": "1" })
+                        $("#weather").css("display", "none");
+                    },1000);
+
                 }
                 break;
             case "quote":
@@ -299,8 +348,14 @@ $(function() {
             case "focus":
                 if (checked) {
                     $(".below-center").css({"visibility": "visible","opacity": "1" });
+                    chrome.storage.sync.set({
+                        'focus_toggle': true
+                    });
                 } else {
                     $(".below-center").css({"visibility": "hidden","opacity": "0" });
+                    chrome.storage.sync.set({
+                        'focus_toggle': false
+                    });
                 }
                 break;
             default:
@@ -308,9 +363,21 @@ $(function() {
         }
     };
 
+    if (localTimestamp === "9999999999999") {
+        $("#pause-btn").css("display", "none");
+        paused = true;
+    }
+    
+
+    if (localWallpaper) {
+        $("body").css(`background-image`, `url(${localWallpaper.wallpaper})`);
+        $("#wallpaper-artist").attr("href", `${localWallpaper.link}?utm_source=personaldashboard&utm_medium=referral`).text(`${localWallpaper.first_name} ${localWallpaper.last_name}`);
+    } else {
+        getWallpaper();
+    };
+
     //Page load initialization
     checkStorage();
-    getWallpaper();
     getTime();
     getQuote();
     checkFocus();
@@ -322,7 +389,7 @@ $(function() {
         console.log(error)
     });
 
-    timer = setInterval(getWallpaper, 3.6e+6); //Invokes getWallpaper function to get new wallpaper 60min=3.6e+6
+    //timer = setInterval(getWallpaper, 3.6e+6); //Invokes getWallpaper function to get new wallpaper 60min=3.6e+6
     setInterval(getWeather, 3.6e+6) //Updates weather every hour
 
 });

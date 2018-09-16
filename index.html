@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Gothic+A1" rel="stylesheet">
+    <link rel="stylesheet" href="/owfont-master/css/owfont-regular.css">
     <link rel="stylesheet" href="style.css">
     <script src="jquery-3.3.1.min.js"></script>
     <script src="popper.min.js" ></script>
@@ -18,17 +19,20 @@
     <button id="menu-btn" class="btn" type="button" data-toggle="modal" data-target="#menu-modal">
             <i class="fas fa-bars"></i>
     </button>
-    <form id="input-search-form" class="input-group trans">
-        <input type="text" id="search-input" class="form-control" placeholder="Google">
-        <div class="input-group-append">
-            <button class="btn btn-secondary" type="submit" id="search-btn"><i class="fas fa-search"></i></button>
-        </div>
-    </form>
+
     <div class="wrapper">
+        <form id="input-search-form" class="input-group trans">
+            <input type="text" id="search-input" class="form-control" placeholder="Google">
+            <div class="input-group-append">
+                <button class="btn btn-secondary" type="submit" id="search-btn"><i class="fas fa-search"></i></button>
+            </div>
+        </form>
         <div class="center">
             <h1 id="time" class="trans"><!--time here--></h1>
-            <h2 id="date"><!--date here--></h2>
-            <h2 id="weather" data-container="body" data-toggle="popover" data-placement="right" data-content=""><!--weather here--></h2>
+            <div class="wrapper-center">
+                <h2 id="date" class="trans"><!--date here--></h2>
+                <h2 id="weather" class="trans" data-container="body" data-toggle="popover" data-placement="right" data-content=""><!--weather here--></h2>
+            </div>
             <h6 id="quote" class="trans"><!--quote here--></h6>
         </div>
         <div class="below-center trans"><!-- focus here --></div>
@@ -65,7 +69,7 @@
                         </li>
                         <li class="nav-item">
                             <label class="switch">
-                                <input type="checkbox" value="search" checked>
+                                <input id="search-toggle" type="checkbox" value="search" checked>
                                 <span class="slider round"></span>
                             </label>
                             Search Bar
@@ -89,7 +93,7 @@
                                 <input type="checkbox" value="weather" checked>
                                 <span class="slider round"></span>
                             </label>
-                            Weather<br>
+                            Weather<br><span id="weather-location"></span>
                         </li>
                         <li class="nav-item">
                             <label class="switch">
@@ -100,7 +104,7 @@
                         </li>
                         <li class="nav-item">
                             <label class="switch">
-                                <input type="checkbox" value="focus" checked>
+                                <input id="focus-toggle" type="checkbox" value="focus" checked>
                                 <span class="slider round"></span>
                             </label>
                             Focus
