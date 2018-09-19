@@ -81,7 +81,7 @@ $(function() {
     var weatherTextRemove;
     var weatherAmPm = "-n"
     var name = "";
-    var localTimestamp = localStorage.getItem("timestamp");
+    var localTimestamp = parseInt(localStorage.getItem("timestamp"));
     var localWallpaper = JSON.parse(localStorage.getItem("wallpaper_info"));
 
     // Checks for name from Chrome Storage
@@ -214,7 +214,7 @@ $(function() {
             url: `https://api.openweathermap.org/data/2.5/weather?units=imperial&lat=${lat}&lon=${lon}&appid=${key}`,
             method: "GET"
         }).then(function(response) {
-            console.log(response);
+            //console.log(response);
             weatherText = ` | <i class="owf owf-${response.weather[0].id}${weatherAmPm}"> </i> ${response.main.temp} &deg;F`
             //console.log(weatherText)
             weatherTextRemove = weatherText.replace(" | ", "");
@@ -233,6 +233,8 @@ $(function() {
         var m = today.getMinutes();
         var amPm;
         var time = today.getTime();
+        console.log(localTimestamp + 3.6e+6)
+        console.log(time)
 
         if (localTimestamp + 3.6e+6 <= time) {
             getWallpaper();
@@ -356,6 +358,13 @@ $(function() {
                     chrome.storage.sync.set({
                         'focus_toggle': false
                     });
+                }
+                break;
+                case "strip":
+                if (checked) {
+                    $(".center").css("background-color", "rgba(108,117,125,0.3)");
+                } else {
+                    $(".center").css("background-color", "rgba(108,117,125,0.0)");
                 }
                 break;
             default:
